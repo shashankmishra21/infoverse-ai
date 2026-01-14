@@ -10,6 +10,7 @@ datasource db {
 model Company {
   id        String   @id @default(uuid())
   name      String
+  code        String   @unique
   createdAt DateTime @default(now())
   users     User[]
 }
