@@ -27,6 +27,37 @@ model User {
   createdAt DateTime @default(now())
 }
 
+model Document {
+  id         String   @id @default(uuid())
+  companyId  String
+  uploadedBy String
+  fileName   String
+  status     String   @default("PROCESSING")
+  createdAt  DateTime @default(now())
+
+  chunks     DocumentChunk[]
+
+  @@index([companyId])
+}
+
+model DocumentChunk {
+  id         String   @id @default(uuid())
+  documentId String
+  companyId  String
+  content    String
+  chunkIndex Int
+
+  // OpenAI embeddings → 1536 dimensions
+  embedding  Unsupported("vector(1536)")
+
+  createdAt  DateTime @default(now())
+
+  document   Document @relation(fields: [documentId], references: [id])
+
+  @@index([companyId])
+  @@index([documentId])
+}
+
 enum Role {
   ADMIN
   USER
