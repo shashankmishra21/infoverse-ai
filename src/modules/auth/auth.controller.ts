@@ -12,6 +12,8 @@ export const register = async (req: Request, res: Response) => {
 
         const result = await registerUser(name, email, password, company);
 
+        const { password: _, ...safeUser } = result.user;
+
         res.status(201).json({
             message:
                 result.user.role === "ADMIN" ? "Company created. You are ADMIN." : "Joined company successfully.",
@@ -19,7 +21,7 @@ export const register = async (req: Request, res: Response) => {
                 name: result.company.name,
                 code: result.company.code,
             },
-            user: result.user,
+            user: safeUser,
         });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
