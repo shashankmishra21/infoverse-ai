@@ -10,7 +10,7 @@ const generateCompanyCode = () => {
 
 //REGISTERR
 export const registerUser = async (name: string, email: string, password: string, companyInput: string) => {
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findFirst({ where: { email } });
     if (existingUser) throw new Error("Email already registered");
 
     const hashedPassword = await bcrypt.hash(password, 10);
