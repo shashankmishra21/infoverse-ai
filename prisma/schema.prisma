@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Company {
   id        String   @id @default(uuid())
   name      String
@@ -23,39 +22,47 @@ model User {
   password  String
   role      Role     @default(USER)
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
   createdAt DateTime @default(now())
+  company   Company  @relation(fields: [companyId], references: [id])
 }
 
 model Document {
-  id         String   @id @default(uuid())
+  id         String          @id @default(uuid())
   companyId  String
   uploadedBy String
   fileName   String
-  status     String   @default("PROCESSING")
-  createdAt  DateTime @default(now())
-
+  status     String          @default("PROCESSING")
+  createdAt  DateTime        @default(now())
   chunks     DocumentChunk[]
 
   @@index([companyId])
 }
 
 model DocumentChunk {
-  id         String   @id @default(uuid())
+  id         String                @id @default(uuid())
   documentId String
   companyId  String
   content    String
   chunkIndex Int
-
-  // OpenAI embeddings → 1536 dimensions
-  embedding  Unsupported("vector(1536)")
-
-  createdAt  DateTime @default(now())
-
-  document   Document @relation(fields: [documentId], references: [id])
+  embedding  Unsupported("vector")
+  createdAt  DateTime              @default(now())
+  document   Document              @relation(fields: [documentId], references: [id])
 
   @@index([companyId])
   @@index([documentId])
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  userId    String
+  companyId String
+  question  String
+  answer    String
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([companyId])
+  @@index([createdAt])
+  @@index([userId])
 }
 
 enum Role {
