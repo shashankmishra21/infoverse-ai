@@ -1,0 +1,31 @@
+
+services:
+  embedding-service:
+    build: ./services/embedding-service
+    container_name: embedding-service
+    ports:
+      - "8001:8001"
+
+  retrieval-service:
+    build: ./services/retrieval-service
+    container_name: retrieval-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      - embedding-service
+    environment:
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      - EMBEDDING_URL=http://embedding-service:8001/embed
+
+  llm-service:
+    build: ./services/llm-service
+    container_name: llm-service
+    ports:
+      - "8003:8003"
+    depends_on:
+      - retrieval-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
